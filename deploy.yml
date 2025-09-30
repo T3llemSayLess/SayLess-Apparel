@@ -1,9 +1,26 @@
-deexport GITHUB_TOKEN="ghp_XXXXXXXXXXXXXXXXXXXXXXXXXXXX"   # required for full automation
-export GITHUB_USER="YourGithubUsername"                 # required
-# optional if you want GitHub Actions to automatically deploy to a remote host:
-# export DEPLOY_HOST="203.0.113.5"
-# export DEPLOY_USER="deployuser"
-# export DEPLOY_PORT="22"
-# then run:
-bash -c "$(curl -fsSL https://pastebin.com/raw/placeholder_for_script)" 
-# (or paste the script below into a file deploy_github.sh and run: bash deploy_github.sh)
+      log "ssh-copy-id failed (host unreachable or credentials missing). You may need to copy $(pwd)/$DEPLOY_KEY_PUBLIC into the remote server's ~/.ssh/authorized_keys manually."
+      log "Public key path: $(pwd)/$DEPLOY_KEY_PUBLIC"
+    fi
+  else
+    log "ssh-copy-id not installed. Please add the public key to remote authorized_keys manually:"
+    log "Public key path: $(pwd)/$DEPLOY_KEY_PUBLIC"
+  fi
+else
+  log "No DEPLOY_HOST/DEPLOY_USER set — skipping automatic authorized_keys step."
+fi
+
+# -------------------------
+# Finalize: push any remaining changes
+# -------------------------
+git add -A
+git commit -m "chore: finalize GitHub CI/CD integration" || true
+if [ -n "${GITHUB_USER:-}" ] && gh api user >/dev/null 2>&1; then
+  git push origin "$MAIN_BRANCH" || true
+fi
+
+log "GitHub integration complete. Repo: ${GITHUB_USER:-<not-set>}/${REPO_NAME}"
+if [ -f "$DEPLOY_KEY_PUBLIC" ]; then
+  log "Generated deploy public key: $(pwd)/$DEPLOY_KEY_PUBLIC"
+fi
+log "If you want Actions to automatically SSH into a remote server, make sure the public key above is in that remote server's ~/.ssh/authorized_keys or let ssh-copy-id succeed earlier."
+log "Done." 
