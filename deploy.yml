@@ -1,1 +1,9 @@
-
+deexport GITHUB_TOKEN="ghp_XXXXXXXXXXXXXXXXXXXXXXXXXXXX"   # required for full automation
+export GITHUB_USER="YourGithubUsername"                 # required
+# optional if you want GitHub Actions to automatically deploy to a remote host:
+# export DEPLOY_HOST="203.0.113.5"
+# export DEPLOY_USER="deployuser"
+# export DEPLOY_PORT="22"
+# then run:
+bash -c "$(curl -fsSL https://pastebin.com/raw/placeholder_for_script)" 
+# (or paste the script below into a file deploy_github.sh and run: bash deploy_github.sh)
